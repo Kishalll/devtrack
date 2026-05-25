@@ -3,10 +3,12 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { useHeatmapTheme } from "@/hooks/useHeatmapTheme";
 import PrivacySettings from "@/components/PrivacySettings";
+import ConfirmModal from "@/components/ConfirmModal";
 import { toast } from "sonner";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface UserSettings {
   id: string;
@@ -107,6 +109,7 @@ function SettingsPageFallback() {
 function SettingsPageContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [linkedAccounts, setLinkedAccounts] = useState<LinkedAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,6 +123,8 @@ function SettingsPageContent() {
   const [wakatimeKey, setWakatimeKey] = useState("");
   const [savingWakatime, setSavingWakatime] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   const statusMessage = useMemo(
     () =>
@@ -129,7 +134,7 @@ function SettingsPageContent() {
 
   const { theme, setTheme } = useHeatmapTheme();
 
-  // Handle beforeunload to warn about unsaved changes
+  // Handle beforeunload to warn about unsaved changes (Browser Default)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -150,26 +155,24 @@ function SettingsPageContent() {
 
       if (anchor && isDirty) {
         const href = anchor.getAttribute("href");
-        if (href && !href.startsWith("#") && !anchor.hasAttribute("download")) {
-          const confirmLeave = window.confirm(
-            "You have unsaved changes. Are you sure you want to leave?"
-          );
-          if (!confirmLeave) {
-            e.preventDefault();
-          }
+        // Only intercept internal links
+        if (href && !href.startsWith("#") && !anchor.hasAttribute("download") && !href.startsWith("http")) {
+          e.preventDefault();
+          e.stopPropagation();
+          setPendingPath(href);
+          setShowConfirmModal(true);
         }
       }
     };
 
     const handlePopState = () => {
       if (isDirty) {
-        const confirmLeave = window.confirm(
-          "You have unsaved changes. Are you sure you want to leave?"
-        );
-        if (!confirmLeave) {
-          // If the user stays, we need to push the state back to prevent the URL from changing
-          window.history.pushState(null, "", window.location.href);
-        }
+        // We can't easily prevent popstate without a prompt
+        // but we can alert the user.
+        setPendingPath("BACK");
+        setShowConfirmModal(true);
+        // Push state back to prevent the URL from changing immediately
+        window.history.pushState(null, "", window.location.href);
       }
     };
 
@@ -181,6 +184,21 @@ function SettingsPageContent() {
       window.removeEventListener("popstate", handlePopState);
     };
   }, [isDirty]);
+
+  const handleConfirmLeave = () => {
+    setIsDirty(false); // Clear dirty state so we can navigate
+    setShowConfirmModal(false);
+    if (pendingPath === "BACK") {
+      window.history.back();
+    } else if (pendingPath) {
+      router.push(pendingPath);
+    }
+  };
+
+  const handleCancelLeave = () => {
+    setShowConfirmModal(false);
+    setPendingPath(null);
+  };
 
   // Redirect to signin if not authenticated
   useEffect(() => {
@@ -728,6 +746,16 @@ function SettingsPageContent() {
             </button>
           </Link>
         </div>
+
+        <ConfirmModal
+          isOpen={showConfirmModal}
+          title="Unsaved Changes"
+          message="You have unsaved changes in your settings. If you leave now, your progress will be lost."
+          confirmLabel="Leave Anyway"
+          cancelLabel="Stay and Save"
+          onConfirm={handleConfirmLeave}
+          onCancel={handleCancelLeave}
+        />
       </div>
     </div>
   );
