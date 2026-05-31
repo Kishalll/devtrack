@@ -77,6 +77,10 @@
   --chart-8: #2dd4bf;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   overscroll-behavior: none;
 }

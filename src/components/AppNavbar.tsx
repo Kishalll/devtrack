@@ -26,6 +26,17 @@ export default function AppNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const hashIndex = href.indexOf("#");
+    if (hashIndex === -1) return;
+    const id = href.slice(hashIndex + 1);
+    const el = document.getElementById(id);
+    if (el) {
+      e.preventDefault();
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   useEffect(() => {
@@ -97,12 +108,18 @@ export default function AppNavbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-300 ${
-                  active 
-                    ? "bg-[var(--accent)]/10 text-[var(--accent)] shadow-sm" 
-                    : "text-[var(--muted-foreground)] hover:bg-white/5 hover:text-[var(--foreground)]"
-                }`}
-                style={{ fontFamily: MONO }}
+                onClick={(e) => handleAnchorClick(e, item.href)}
+                className="relative px-3 py-2 text-[12px] font-medium transition-colors duration-150"
+                style={{
+                  fontFamily: MONO,
+                  color: active ? "var(--accent)" : "var(--muted-foreground)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) (e.currentTarget as HTMLAnchorElement).style.color = "var(--foreground)";
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) (e.currentTarget as HTMLAnchorElement).style.color = "var(--muted-foreground)";
+                }}
               >
                 {item.label}
               </Link>
@@ -180,10 +197,13 @@ export default function AppNavbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-xl px-4 py-3.5 text-sm font-medium transition-colors ${
-                    active ? "bg-[var(--accent)]/15 text-[var(--accent)]" : "text-[var(--muted-foreground)] hover:bg-white/5"
-                  }`}
-                  style={{ fontFamily: MONO }}
+                  onClick={(e) => handleAnchorClick(e, item.href)}
+                  className="rounded-lg px-4 py-3 text-sm font-medium transition-colors"
+                  style={{
+                    fontFamily: MONO,
+                    color: active ? "var(--accent)" : "var(--muted-foreground)",
+                    background: active ? "var(--accent-soft)" : "transparent",
+                  }}
                 >
                   {item.label}
                 </Link>
