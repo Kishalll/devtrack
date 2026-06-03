@@ -98,7 +98,7 @@ export default function WeeklySummaryCard() {
               <div
                 key={i}
                 aria-hidden="true"
-                className="h-14 rounded-lg bg-[var(--card-muted)] animate-pulse"
+                className="h-20 rounded-lg bg-[var(--card-muted)] animate-pulse"
               />
             ))}
           </div>
