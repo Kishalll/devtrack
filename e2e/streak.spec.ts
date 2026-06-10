@@ -136,6 +136,13 @@ test.describe("[Streak E2E]", () => {
       });
     }
 
+    await page.route("**/api/user/dashboard-layout**", async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({}),
+      });
+    });
+
     await page.route("**/api/stream**", async (route) => {
       await route.fulfill({
         status: 200,
@@ -171,10 +178,16 @@ test.describe("[Streak E2E]", () => {
       'xpath=ancestor::div[contains(@class,"rounded-xl")][1]'
     );
 
-    // With reducedMotion active, useCountUp calls setCount(target) immediately,
-    // so "21" is present in the DOM as soon as the stats grid renders.
-    await expect(section.getByText("21", { exact: true })).toBeVisible({
-      timeout: 5_000,
-    });
+    // The "Longest Streak" stat card contains the number as a raw text node
+    // inside a div whose full text content is "21 days" (number + unit span).
+    // getByText("21", { exact: true }) never matches because no single element
+    // has textContent of exactly "21" — the nearest element reads "21 days".
+    // Use the stat card's aria-label to scope to the correct card, then assert
+    // the card itself contains the text "21".
+    const longestStreakCard = section.locator(
+      '[aria-label="Your longest streak ever"]'
+    );
+    await expect(longestStreakCard).toBeVisible({ timeout: 5_000 });
+    await expect(longestStreakCard).toContainText("21");
   });
 });
