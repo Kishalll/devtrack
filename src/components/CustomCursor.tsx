@@ -167,9 +167,7 @@ export default function CustomCursor() {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          borderWidth: "1.5px",
-          borderStyle: "solid",
-          borderColor: "#00f0ff",
+          border: "1.5px solid #00f0ff",
           pointerEvents: "none",
           zIndex: 99997, // just below the dot
           opacity: isHidden ? 0 : 0.85,
