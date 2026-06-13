@@ -211,10 +211,11 @@ function MouseSpotlight() {
     <div
       ref={ref}
       aria-hidden
+      className="mouse-spotlight"
       style={{
         position: 'fixed', pointerEvents: 'none', zIndex: 0,
         width: 700, height: 700,
-        background: 'radial-gradient(circle, rgba(129,140,248,0.05) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(129,140,248,0.18) 0%, rgba(129,140,248,0.06) 50%, transparent 70%)',
         transform: 'translate(-50%,-50%)',
         transition: 'left 0.15s ease-out, top 0.15s ease-out',
       }}
@@ -464,7 +465,7 @@ function HeroSection() {
       style={{
         minHeight: '100vh',
         display: 'flex', alignItems: 'center',
-        padding: '80px clamp(24px,5vw,64px) 40px',
+        padding: 'clamp(100px, 12vh, 140px) clamp(24px,5vw,64px) 40px',
         gap: 'clamp(32px,5vw,80px)',
         flexWrap: 'wrap', justifyContent: 'center',
         position: 'relative', zIndex: 1,
@@ -482,7 +483,7 @@ function HeroSection() {
           zIndex: -2,
         }}
       />
-      
+
       {/* Ambient Animated Background Glow */}
       <div 
         style={{
@@ -510,7 +511,7 @@ function HeroSection() {
           zIndex: -1,
         }}
       />
-      
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes floatGlow {
           0% { transform: translate(0px, 0px) scale(1); opacity: 0.5; }
@@ -531,7 +532,7 @@ function HeroSection() {
         {/* Badge */}
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
-          background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.25)',
+          background: 'color-mix(in srgb, var(--accent) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 40%, transparent)',
           borderRadius: 24, padding: '6px 14px', marginBottom: 28,
           boxShadow: '0 4px 14px rgba(129,140,248,0.1)',
         }}>
@@ -548,7 +549,7 @@ function HeroSection() {
             fontSize: 'clamp(44px,7vw,82px)', lineHeight: 0.95,
             letterSpacing: '-0.04em', margin: '0 0 24px',
             animation: 'lndHeroIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s both',
-            background: 'linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%)',
+            background: 'linear-gradient(180deg, var(--foreground) 0%, color-mix(in srgb, var(--foreground) 70%, transparent) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             textShadow: '0 4px 24px rgba(0,0,0,0.8)',
@@ -566,9 +567,9 @@ function HeroSection() {
 
         {/* Tagline */}
         <p style={{
-          fontSize: 'clamp(16px,2vw,18px)', color: MUTED,
+          fontSize: 'clamp(16px,2vw,18px)', color: 'var(--foreground)',
           lineHeight: 1.6, maxWidth: 420, margin: '0 0 40px',
-          fontWeight: 400, letterSpacing: '0.01em',
+          fontWeight: 400, letterSpacing: '0.01em', opacity: 0.85,
         }}>
           Open-source developer productivity dashboard. Track GitHub streaks,
           PR velocity, and coding goals — automatically.

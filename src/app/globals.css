@@ -588,7 +588,7 @@ body {
   font-family: var(--font-jetbrains, ui-monospace, monospace);
   font-size: 13px;
   font-weight: 500;
-  color: var(--muted-foreground);
+  color: var(--foreground);
   background: transparent;
   padding: 11px 22px;
   border-radius: 6px;
@@ -696,4 +696,18 @@ body {
 
 .animate-shimmer {
   animation: shimmer 1.5s infinite;
+}
+/* Mouse spotlight enhancement for visibility on all backgrounds */
+.lnd-root .mouse-spotlight {
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Focus styles for accessibility - landing page specific */
+.lnd-root button:focus-visible,
+.lnd-root a:focus-visible,
+.lnd-root [role="button"]:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
